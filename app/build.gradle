@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.butterknife'
 apply plugin: "me.tatarka.retrolambda"
 
+def keyPropertiesFile = rootProject.file("key.properties")
+def keyProperties = new Properties()
+keyProperties.load(new FileInputStream(keyPropertiesFile))
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -12,7 +16,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "THEMOVIEDB_KEY", "\"7b9f3e52b365a8a2e7f7487c240f85b5\"")
+
+        each {type ->
+            type.buildConfigField("String", "THEMOVIEDB_KEY", keyProperties['TheMovieDBApi'])
+        }
+
     }
     buildTypes {
         release {
