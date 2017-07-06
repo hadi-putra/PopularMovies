@@ -39,7 +39,7 @@ public class MainPresenter {
                 movieApi.getByPopular(selectedSort == Sort.RATING? TOP_RATED_QUERY : POPULAR_QUERY);
         if (request != null){
             compositeDisposable.add(request
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .map(ResponseApi::getResults)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(movieModels -> {
