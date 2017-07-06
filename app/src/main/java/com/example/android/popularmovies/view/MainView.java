@@ -10,4 +10,8 @@ import java.util.List;
 
 public interface MainView {
     void setMovies(List<MovieModel> movieModels);
+
+    void showLoading();
+
+    void hideLoading();
 }

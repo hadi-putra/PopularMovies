@@ -18,6 +18,5 @@ import retrofit2.http.Query;
 public interface MovieApi {
 
     @GET("movie/{sort}")
-    Observable<ResponseApi<MovieModel>> getByPopular(@Path("sort") String sort,
-                                                   @Query("api_key") String apiKey);
+    Observable<ResponseApi<MovieModel>> getByPopular(@Path("sort") String sort);
 }

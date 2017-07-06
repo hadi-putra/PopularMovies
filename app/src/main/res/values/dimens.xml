@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_padding">16dp</dimen>
+    <dimen name="marginTop_poster">180dp</dimen>
+    <dimen name="marginTop_title">216dp</dimen>
+    <dimen name="poster_height">300dp</dimen>
+</resources>

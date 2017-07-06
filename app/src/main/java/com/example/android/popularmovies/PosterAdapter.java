@@ -21,11 +21,19 @@ import butterknife.ButterKnife;
 
 public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterViewHolder> {
     private List<MovieModel> movies;
+    private final PosterAdapterOnClickHandler mClickHandler;
+
+    public interface PosterAdapterOnClickHandler {
+        void onClick(MovieModel movie);
+    }
 
     public void setMovies(List<MovieModel> movies) {
         this.movies = movies;
         notifyDataSetChanged();
-        Log.e(this.getClass().getName(), ""+this.getItemCount());
+    }
+
+    public PosterAdapter(PosterAdapterOnClickHandler mClickHandler) {
+        this.mClickHandler = mClickHandler;
     }
 
     @Override
@@ -47,12 +55,13 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
             return movies.size();
     }
 
-    class PosterViewHolder extends RecyclerView.ViewHolder{
+    class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.iv_poster) ImageView mPosterImageView;
 
         private PosterViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         private void bind(MovieModel movie){
@@ -60,6 +69,11 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                 Picasso.with(itemView.getContext())
                         .load(movie.getPosterPath())
                         .into(mPosterImageView);
+        }
+
+        @Override
+        public void onClick(View view) {
+            mClickHandler.onClick(movies.get(getAdapterPosition()));
         }
     }
 }
