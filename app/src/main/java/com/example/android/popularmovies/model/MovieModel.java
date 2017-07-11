@@ -12,6 +12,8 @@ import com.squareup.moshi.Json;
 public class MovieModel implements Parcelable {
     private static final transient String BASE_PHOTO_PATH = "http://image.tmdb.org/t/p/w185";
     private static final transient String BASE_BACKDROP_PATH = "http://image.tmdb.org/t/p/w342";
+
+    private int id;
     private String title;
     @Json(name = "backdrop_path") private String backdropPath;
     @Json(name = "vote_average") private double voteAverage;
@@ -29,6 +31,14 @@ public class MovieModel implements Parcelable {
     }
 
     public MovieModel() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {

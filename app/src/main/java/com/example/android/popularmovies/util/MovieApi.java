@@ -2,6 +2,8 @@ package com.example.android.popularmovies.util;
 
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.model.ResponseApi;
+import com.example.android.popularmovies.model.ReviewModel;
+import com.example.android.popularmovies.model.TrailerModel;
 
 import java.util.List;
 
@@ -18,5 +20,11 @@ import retrofit2.http.Query;
 public interface MovieApi {
 
     @GET("movie/{sort}")
-    Observable<ResponseApi<MovieModel>> getByPopular(@Path("sort") String sort);
+    Observable<ResponseApi<MovieModel>> getMovies(@Path("sort") String sort);
+
+    @GET("movie/{id}/reviews")
+    Observable<ResponseApi<ReviewModel>> getReviewByMovieId(@Path("id") int id);
+
+    @GET("movie/{id}/videos")
+    Observable<ResponseApi<TrailerModel>> getTrailersByMovieId(@Path("id") int id);
 }

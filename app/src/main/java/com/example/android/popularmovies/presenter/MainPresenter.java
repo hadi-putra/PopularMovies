@@ -36,7 +36,7 @@ public class MainPresenter {
     public void loadMovie(Sort selectedSort) {
         view.showLoading();
         Observable<ResponseApi<MovieModel>> request =
-                movieApi.getByPopular(selectedSort == Sort.RATING? TOP_RATED_QUERY : POPULAR_QUERY);
+                movieApi.getMovies(selectedSort == Sort.RATING? TOP_RATED_QUERY : POPULAR_QUERY);
         if (request != null){
             compositeDisposable.add(request
                     .subscribeOn(Schedulers.newThread())
