@@ -4,7 +4,7 @@ import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.model.ResponseApi;
 import com.example.android.popularmovies.util.MovieApi;
 import com.example.android.popularmovies.util.Sort;
-import com.example.android.popularmovies.view.MainView;
+import com.example.android.popularmovies.ui.view.MainView;
 
 import javax.inject.Inject;
 
@@ -24,7 +24,6 @@ public class MainPresenter {
     private MainView view;
     private MovieApi movieApi;
     private final CompositeDisposable compositeDisposable;
-
 
     @Inject
     public MainPresenter(MainView view, MovieApi movieApi) {

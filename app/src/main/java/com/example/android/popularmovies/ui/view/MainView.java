@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.view;
+package com.example.android.popularmovies.ui.view;
 
 import com.example.android.popularmovies.model.MovieModel;
 
