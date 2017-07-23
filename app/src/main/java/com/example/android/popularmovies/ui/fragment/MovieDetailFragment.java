@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,6 +16,7 @@ import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.presenter.MovieDetailPresenter;
 import com.example.android.popularmovies.ui.view.MovieDetailView;
+import com.example.android.popularmovies.util.MovieUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
@@ -36,6 +39,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
     @BindView(R.id.release_date) TextView mReleaseDateTextView;
     @BindView(R.id.rate) TextView mRatingTextView;
     @BindView(R.id.overview) TextView mOverviewTextView;
+    @BindView(R.id.favorite) CheckBox mFavorite;
 
     @Inject MovieDetailPresenter mPresenter;
 
@@ -76,6 +80,10 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
             mPresenter.loadTrailer();
             mPresenter.loadReview();
         }
+
+        mFavorite.setOnCheckedChangeListener((CompoundButton compoundButton, boolean check) -> {
+            mPresenter.toggleFavorite(check);
+        });
     }
 
     @Override
@@ -88,13 +96,13 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
 
         if (movie.getBackdropPath() != null){
             Picasso.with(getActivity())
-                    .load(movie.getBackdropPath())
+                    .load(MovieUtil.getFullBackdropPath(movie.getBackdropPath()))
                     .into(mBackdropImageView);
         }
 
         if (movie.getPosterPath() != null){
             Picasso.with(getActivity())
-                    .load(movie.getPosterPath())
+                    .load(MovieUtil.getFullPosterPath(movie.getPosterPath()))
                     .into(mPosterImageView);
         }
     }

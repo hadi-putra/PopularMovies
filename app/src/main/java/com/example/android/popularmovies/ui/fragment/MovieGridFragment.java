@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -32,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.android.support.AndroidSupportInjection;
 
+import static com.example.android.popularmovies.util.Sort.FAVORITE;
 import static com.example.android.popularmovies.util.Sort.POPULAR;
 import static com.example.android.popularmovies.util.Sort.RATING;
 
@@ -150,6 +152,12 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
                     onSortOptionChanged(RATING);
                 }
                 return true;
+            case R.id.action_favorite:
+                if (selectedSort != FAVORITE){
+                    item.setChecked(true);
+                    onSortOptionChanged(FAVORITE);
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -158,9 +166,20 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
     private void onSortOptionChanged(Sort option) {
         selectedMovie = null;
         mStateGrid = null;
-        getActivity().setTitle(option == Sort.POPULAR? R.string.app_name : R.string.top_rated_title);
+        getActivity().setTitle(getTitle(option));
         selectedSort = option;
-        mPresenter.loadMovie(option);
+        if (option == FAVORITE)
+            mPresenter.loadFavorite();
+        else
+            mPresenter.loadMovie(option);
+    }
+
+    private int getTitle(Sort option) {
+        switch (option) {
+            case RATING: return R.string.top_rated_title;
+            case FAVORITE: return R.string.favorite_title;
+            default: return R.string.app_name;
+        }
     }
 
     @Override

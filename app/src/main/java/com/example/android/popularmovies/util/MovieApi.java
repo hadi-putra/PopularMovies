@@ -23,8 +23,8 @@ public interface MovieApi {
     Observable<ResponseApi<MovieModel>> getMovies(@Path("sort") String sort);
 
     @GET("movie/{id}/reviews")
-    Flowable<ResponseApi<ReviewModel>> getReviewByMovieId(@Path("id") int id);
+    Flowable<ResponseApi<ReviewModel>> getReviewByMovieId(@Path("id") long id);
 
     @GET("movie/{id}/videos")
-    Flowable<ResponseApi<TrailerModel>> getTrailersByMovieId(@Path("id") int id);
+    Flowable<ResponseApi<TrailerModel>> getTrailersByMovieId(@Path("id") long id);
 }

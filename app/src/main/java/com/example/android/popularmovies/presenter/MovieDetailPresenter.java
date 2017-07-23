@@ -2,6 +2,7 @@ package com.example.android.popularmovies.presenter;
 
 import android.util.Log;
 
+import com.example.android.popularmovies.data.MovieRepository;
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.model.ResponseApi;
 import com.example.android.popularmovies.model.TrailerModel;
@@ -21,14 +22,14 @@ import io.reactivex.schedulers.Schedulers;
 public class MovieDetailPresenter {
     private MovieDetailView view;
     private final CompositeDisposable compositeDisposable;
-    private final MovieApi movieApi;
+    private final MovieRepository movieRepository;
     private MovieModel selectedMovie;
 
     @Inject
-    public MovieDetailPresenter(MovieDetailView view, MovieApi movieApi) {
+    public MovieDetailPresenter(MovieDetailView view, MovieRepository movieRepository) {
         this.view = view;
         compositeDisposable = new CompositeDisposable();
-        this.movieApi = movieApi;
+        this.movieRepository = movieRepository;
     }
 
     public void setDetailForMovie(MovieModel movie) {
@@ -37,9 +38,7 @@ public class MovieDetailPresenter {
     }
 
     public void loadTrailer() {
-        compositeDisposable.add(movieApi.getTrailersByMovieId(selectedMovie.getId())
-                .subscribeOn(Schedulers.newThread())
-                .map(ResponseApi::getResults)
+        compositeDisposable.add(movieRepository.getMovieVideos(selectedMovie.getId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(trailerModels -> {
                     Log.e("TRAILERS", trailerModels.toString());
@@ -49,14 +48,17 @@ public class MovieDetailPresenter {
     }
 
     public void loadReview() {
-        compositeDisposable.add(movieApi.getReviewByMovieId(selectedMovie.getId())
-                .subscribeOn(Schedulers.newThread())
-                .map(ResponseApi::getResults)
+        compositeDisposable.add(movieRepository.getMovieReviews(selectedMovie.getId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(trailerModels -> {
                     Log.e("REVIEWS", trailerModels.toString());
                 },throwable -> {
 
                 }));
+    }
+
+    public void toggleFavorite(boolean isFavorite) {
+        selectedMovie.setFavorite(isFavorite);
+        movieRepository.toggleFavorite(isFavorite, selectedMovie);
     }
 }

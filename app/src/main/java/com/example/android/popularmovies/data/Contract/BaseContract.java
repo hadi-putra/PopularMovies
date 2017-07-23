@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.data;
+package com.example.android.popularmovies.data.Contract;
 
 import android.net.Uri;
 

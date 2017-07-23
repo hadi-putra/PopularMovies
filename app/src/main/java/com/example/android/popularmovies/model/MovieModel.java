@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.model;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,16 +11,16 @@ import com.squareup.moshi.Json;
  */
 
 public class MovieModel implements Parcelable {
-    private static final transient String BASE_PHOTO_PATH = "http://image.tmdb.org/t/p/w185";
-    private static final transient String BASE_BACKDROP_PATH = "http://image.tmdb.org/t/p/w342";
-
-    private int id;
+    private long id;
     private String title;
     @Json(name = "backdrop_path") private String backdropPath;
     @Json(name = "vote_average") private double voteAverage;
+    @Json(name = "vote_count") private int voteCount;
+    private double popularity;
     @Json(name = "poster_path") private String posterPath;
     @Json(name = "release_date") private String releaseDate;
     private String overview;
+    private boolean isFavorite;
 
     public MovieModel(Parcel parcel) {
         title = parcel.readString();
@@ -33,11 +34,11 @@ public class MovieModel implements Parcelable {
     public MovieModel() {
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -50,13 +51,11 @@ public class MovieModel implements Parcelable {
     }
 
     public String getPosterPath() {
-        if (posterPath == null) return null;
-        else return BASE_PHOTO_PATH+posterPath;
+        return posterPath;
     }
 
     public String getBackdropPath() {
-        if (backdropPath == null) return null;
-        else return BASE_BACKDROP_PATH+backdropPath;
+        return backdropPath;
     }
 
     public String getReleaseDate() {
@@ -91,6 +90,29 @@ public class MovieModel implements Parcelable {
         this.overview = overview;
     }
 
+    public int getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(int voteCount) {
+        this.voteCount = voteCount;
+    }
+
+    public double getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(double popularity) {
+        this.popularity = popularity;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
     @Override
     public int describeContents() {

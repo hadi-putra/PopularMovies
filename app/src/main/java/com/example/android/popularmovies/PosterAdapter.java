@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.android.popularmovies.model.MovieModel;
+import com.example.android.popularmovies.util.MovieUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -67,7 +68,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         private void bind(MovieModel movie){
             if (movie.getPosterPath() != null)
                 Picasso.with(itemView.getContext())
-                        .load(movie.getPosterPath())
+                        .load(MovieUtil.getFullPosterPath(movie.getPosterPath()))
                         .into(mPosterImageView);
         }
 

@@ -21,6 +21,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.MovieDetailActivity"/>
+
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false"/>
     </application>
 
 </manifest>

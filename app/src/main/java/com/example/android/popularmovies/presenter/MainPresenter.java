@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.presenter;
 
+import com.example.android.popularmovies.data.MovieRepository;
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.model.ResponseApi;
 import com.example.android.popularmovies.util.MovieApi;
@@ -18,41 +19,48 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class MainPresenter {
-    private static final String POPULAR_QUERY = "popular";
-    private static final String TOP_RATED_QUERY = "top_rated";
 
     private MainView view;
-    private MovieApi movieApi;
+    private MovieRepository movieRepository;
     private final CompositeDisposable compositeDisposable;
 
     @Inject
-    public MainPresenter(MainView view, MovieApi movieApi) {
+    public MainPresenter(MainView view, MovieRepository movieRepository) {
         this.view = view;
         compositeDisposable = new CompositeDisposable();
-        this.movieApi = movieApi;
+        this.movieRepository = movieRepository;
     }
 
     public void loadMovie(Sort selectedSort) {
         view.showLoading();
-        Observable<ResponseApi<MovieModel>> request =
-                movieApi.getMovies(selectedSort == Sort.RATING? TOP_RATED_QUERY : POPULAR_QUERY);
-        if (request != null){
-            compositeDisposable.add(request
-                    .subscribeOn(Schedulers.newThread())
-                    .map(ResponseApi::getResults)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(movieModels -> {
-                        view.hideLoading();
-                        view.setMovies(movieModels);
-                    }, throwable ->{
-                        view.hideLoading();
-                        throwable.printStackTrace();
-                    }));
-        }
+        compositeDisposable.clear();
+        compositeDisposable.add(movieRepository.getSortedMovies(selectedSort)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(movieModels -> {
+                            view.hideLoading();
+                            view.setMovies(movieModels);
+                        }, throwable ->{
+                            view.hideLoading();
+                            throwable.printStackTrace();
+                        }));
     }
 
     public void clearSubscription() {
         view.hideLoading();
         compositeDisposable.dispose();
+    }
+
+    public void loadFavorite() {
+        view.showLoading();
+        compositeDisposable.clear();
+        compositeDisposable.add(movieRepository.getFavorites()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(movieModels -> {
+                    view.hideLoading();
+                    view.setMovies(movieModels);
+                }, throwable ->{
+                    view.hideLoading();
+                    throwable.printStackTrace();
+                }));
     }
 }

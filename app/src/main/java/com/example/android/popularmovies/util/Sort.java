@@ -5,5 +5,5 @@ package com.example.android.popularmovies.util;
  */
 
 public enum Sort {
-    POPULAR, RATING
+    POPULAR, RATING, FAVORITE
 }

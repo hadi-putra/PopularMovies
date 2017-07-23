@@ -1,10 +1,13 @@
 package com.example.android.popularmovies.di.module;
 
+import android.content.ContentResolver;
 import android.content.Context;
 
 import com.example.android.popularmovies.App;
 import com.example.android.popularmovies.BuildConfig;
+import com.example.android.popularmovies.data.MovieRepository;
 import com.example.android.popularmovies.util.MovieApi;
+import com.squareup.sqlbrite2.BriteContentResolver;
 
 import javax.inject.Singleton;
 
@@ -71,6 +74,13 @@ public class AppModule {
     @Provides
     MovieApi provideMovieApi(Retrofit retrofit){
         return retrofit.create(MovieApi.class);
+    }
+
+    @Singleton
+    @Provides
+    MovieRepository provideMovieRepository(MovieApi movieApi, ContentResolver contentResolver,
+                                           BriteContentResolver briteContentResolver) {
+        return new MovieRepository(movieApi, briteContentResolver, contentResolver);
     }
 
 }
