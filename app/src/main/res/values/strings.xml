@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Popular Movies</string>
     <string name="sort_menu_label">Sort</string>
     <string name="popular_sort_label">Popularity</string>
@@ -19,4 +19,7 @@
     <string name="overview_label">Overview</string>
     <string name="video_label">Video</string>
     <string name="review_label">Review</string>
+    <string name="video_not_supported">Unsupported video format</string>
+    <string name="action_share">Share</string>
+    <string name="share_template">Check out \'<xliff:g id="title">%1$s</xliff:g>\' at <xliff:g id="url">%2$s</xliff:g></string>
 </resources>

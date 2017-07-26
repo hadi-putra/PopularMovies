@@ -1,11 +1,16 @@
 package com.example.android.popularmovies.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -14,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.model.MovieModel;
@@ -157,12 +163,23 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
             final TextView mVideoTitle = (TextView) view.findViewById(R.id.video_title);
             mVideoTitle.setText(String.format(Locale.getDefault(), "[%s] %s", trailer.getType(),
                     trailer.getName()));
+            view.setTag(trailer);
+            view.setOnClickListener(view1 -> {
+                TrailerModel t = (TrailerModel) view1.getTag();
+                if (t.getSite().equalsIgnoreCase("YouTube")){
+                    Intent intent = new Intent(Intent.ACTION_VIEW, MovieUtil.getVideoUri(t.getKey()));
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), R.string.video_not_supported, Toast.LENGTH_SHORT).show();
+                }
+            });
 
             mVideoContainer.addView(view);
 
         }
 
         mVideoContainer.setVisibility(View.VISIBLE);
+        getActivity().invalidateOptionsMenu();
 
     }
 
@@ -201,5 +218,40 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
         outState.putIntArray(SCROLL_STATE_KEY, new int[]{mScrollView.getScrollX(), mScrollView.getScrollY()});
         outState.putParcelableArrayList(VIDEOS_STATE_KEY, new ArrayList<>(mPresenter.getVideos()));
         outState.putParcelableArrayList(REVIEWS_STATE_KEY, new ArrayList<>(mPresenter.getReviews()));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.detail_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (mPresenter.getVideos() != null && mPresenter.getVideos().size() > 0)
+            menu.findItem(R.id.action_share).setVisible(true);
+        else
+            menu.findItem(R.id.action_share).setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_share:
+                share(mPresenter.getVideos().get(0));
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void share(TrailerModel trailerModel) {
+        Intent intent = ShareCompat.IntentBuilder.from(getActivity())
+                .setType("text/plain")
+                .setText(getString(R.string.share_template, String.format(Locale.getDefault(),
+                        "[%s] %s", trailerModel.getType(), trailerModel.getName()),
+                        MovieUtil.getVideoUri(trailerModel.getKey()).toString()))
+                .getIntent();
+        startActivity(Intent.createChooser(intent, getString(R.string.action_share)));
     }
 }

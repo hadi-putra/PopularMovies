@@ -1,6 +1,7 @@
 package com.example.android.popularmovies.util;
 
 import android.content.ContentValues;
+import android.net.Uri;
 
 import com.example.android.popularmovies.data.Contract.MovieContract;
 import com.example.android.popularmovies.model.MovieModel;
@@ -13,6 +14,7 @@ public class MovieUtil {
     private static final transient String BASE_PHOTO_PATH = "http://image.tmdb.org/t/p/w185";
     private static final transient String BASE_BACKDROP_PATH = "http://image.tmdb.org/t/p/w342";
     private static final transient String YOUTUBE_THUMBNAIL_PATH = "http://img.youtube.com/vi/";
+    private static final transient String YOUTUBE_VIDEO_PATH = "http://www.youtube.com/watch?v=";
 
 
     public static String getFullPosterPath(String posterPath){
@@ -47,5 +49,9 @@ public class MovieUtil {
     public static String customNullAuthor(String author) {
         if (author == null || author.isEmpty()) return "No name";
         return author;
+    }
+
+    public static Uri getVideoUri(String key) {
+        return Uri.parse(YOUTUBE_VIDEO_PATH+key);
     }
 }
