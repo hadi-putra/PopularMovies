@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.android.popularmovies.data.Contract.BaseContract;
 import com.example.android.popularmovies.data.Contract.MovieContract;
@@ -97,7 +98,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
-        int totalRow = 0;
+        int totalRow;
         switch (sUriMatcher.match(uri)){
             case CODE_MOVIE:
                 totalRow = sqLiteDatabase.delete(MovieContract.MovieEntry.TABLE_NAME,
@@ -106,6 +107,7 @@ public class MovieProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+
         if (totalRow > 0){
             getContext().getContentResolver().notifyChange(uri, null);
         }

@@ -42,7 +42,7 @@ public class MovieRepository {
 
     private BehaviorSubject<Set<Long>> mSavedMovieIdsSubject;
 
-    private static final String[] MOVIE_PROJECTION = new String[]{
+    public static final String[] MOVIE_PROJECTION = new String[]{
             MovieContract.MovieEntry.COLUMN_MOVIEDB_ID,
             MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
@@ -59,16 +59,16 @@ public class MovieRepository {
             MovieContract.MovieEntry.COLUMN_MOVIEDB_ID
     };
 
-    private static final int INDEX_MOVIEDB_ID = 0;
-    private static final int INDEX_MOVIE_TITLE = 1;
-    private static final int INDEX_MOVIE_OVERVIEW = 2;
-    private static final int INDEX_MOVIE_BACKDROP = 3;
-    private static final int INDEX_MOVIE_POSTER = 4;
-    private static final int INDEX_MOVIE_VOTE_AVG = 5;
-    private static final int INDEX_MOVIE_VOTE_COUNT = 6;
-    private static final int INDEX_MOVIE_POPULARITY = 7;
-    private static final int INDEX_MOVIE_RELEASE_DATE = 8;
-    private static final int INDEX_MOVIE_IS_FAVORITE = 9;
+    public static final int INDEX_MOVIEDB_ID = 0;
+    public static final int INDEX_MOVIE_TITLE = 1;
+    public static final int INDEX_MOVIE_OVERVIEW = 2;
+    public static final int INDEX_MOVIE_BACKDROP = 3;
+    public static final int INDEX_MOVIE_POSTER = 4;
+    public static final int INDEX_MOVIE_VOTE_AVG = 5;
+    public static final int INDEX_MOVIE_VOTE_COUNT = 6;
+    public static final int INDEX_MOVIE_POPULARITY = 7;
+    public static final int INDEX_MOVIE_RELEASE_DATE = 8;
+    public static final int INDEX_MOVIE_IS_FAVORITE = 9;
 
     public MovieRepository(MovieApi movieApi, BriteContentResolver briteContentResolver,
                            ContentResolver contentResolver) {
@@ -90,7 +90,7 @@ public class MovieRepository {
                 .subscribeOn(Schedulers.io());
     }
 
-    private Observable<Set<Long>> getFavoriteIds() {
+    public Observable<Set<Long>> getFavoriteIds() {
         if (mSavedMovieIdsSubject == null){
             mSavedMovieIdsSubject = BehaviorSubject.create();
             favoriteIds().subscribe(mSavedMovieIdsSubject);
@@ -159,18 +159,37 @@ public class MovieRepository {
         return moviedbIds;
     };
 
-    public void toggleFavorite(boolean isFavorite, MovieModel movie) {
+    public void toggleFavorite(MovieModel movie) {
         AsyncQueryHandler asyncQueryHandler = new AsyncQueryHandler(contentResolver) {};
-        if (isFavorite) {
-            Log.e(getClass().getSimpleName(), "Favorite");
+        if (movie.isFavorite()) {
             asyncQueryHandler.startInsert(-1, null, MovieContract.MovieEntry.CONTENT_URI,
                     MovieUtil.movieToContentValues(movie));
         } else {
-            Log.e(getClass().getSimpleName(), "Unfavorite");
             asyncQueryHandler.startDelete(-1, null,
                     MovieContract.MovieEntry.CONTENT_URI,
                     MovieContract.MovieEntry.COLUMN_MOVIEDB_ID+"=?",
                     new String[]{Long.toString(movie.getId())});
         }
+    }
+
+    public List<MovieModel> getMoviesFromCursor(Cursor cursor) {
+        List<MovieModel> movies = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                MovieModel movie = new MovieModel();
+                movie.setId(cursor.getLong(INDEX_MOVIEDB_ID));
+                movie.setTitle(cursor.getString(INDEX_MOVIE_TITLE));
+                movie.setOverview(cursor.getString(INDEX_MOVIE_OVERVIEW));
+                movie.setBackdropPath(cursor.getString(INDEX_MOVIE_BACKDROP));
+                movie.setPosterPath(cursor.getString(INDEX_MOVIE_POSTER));
+                movie.setVoteAverage(cursor.getDouble(INDEX_MOVIE_VOTE_AVG));
+                movie.setVoteCount(cursor.getInt(INDEX_MOVIE_VOTE_COUNT));
+                movie.setPopularity(cursor.getDouble(INDEX_MOVIE_POPULARITY));
+                movie.setReleaseDate(cursor.getString(INDEX_MOVIE_RELEASE_DATE));
+                movie.setFavorite(cursor.getInt(INDEX_MOVIE_IS_FAVORITE) == 1);
+                movies.add(movie);
+            }
+        }
+        return movies;
     }
 }

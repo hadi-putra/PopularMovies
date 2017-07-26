@@ -79,9 +79,10 @@ public class MovieDetailPresenter {
                 }));
     }
 
-    public void toggleFavorite(boolean isFavorite) {
-        selectedMovie.setFavorite(isFavorite);
-        movieRepository.toggleFavorite(isFavorite, selectedMovie);
+    public void toggleFavorite() {
+        selectedMovie.setFavorite(!selectedMovie.isFavorite());
+        movieRepository.toggleFavorite(selectedMovie);
+        view.toggleFavoriteFab(selectedMovie.isFavorite());
     }
 
     public List<TrailerModel> getVideos() {
@@ -98,5 +99,16 @@ public class MovieDetailPresenter {
 
     public void setReviews(ArrayList<ReviewModel> reviews) {
         this.reviews = reviews;
+    }
+
+    public void checkFavorite() {
+        compositeDisposable.add(movieRepository.getFavoriteIds()
+                .map(ids -> ids.contains(selectedMovie.getId()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(favorite -> {
+                    selectedMovie.setFavorite(favorite);
+                    view.toggleFavoriteFab(favorite);
+                }, throwable -> {}));
     }
 }

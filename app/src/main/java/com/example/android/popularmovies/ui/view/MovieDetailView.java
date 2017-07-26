@@ -16,4 +16,6 @@ public interface MovieDetailView {
     void showTrailer(List<TrailerModel> trailers);
 
     void showReview(List<ReviewModel> reviews);
+
+    void toggleFavoriteFab(boolean favorite);
 }

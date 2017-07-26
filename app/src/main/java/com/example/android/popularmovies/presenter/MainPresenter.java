@@ -1,5 +1,7 @@
 package com.example.android.popularmovies.presenter;
 
+import android.database.Cursor;
+
 import com.example.android.popularmovies.data.MovieRepository;
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.model.ResponseApi;
@@ -62,5 +64,9 @@ public class MainPresenter {
                     view.hideLoading();
                     throwable.printStackTrace();
                 }));
+    }
+
+    public void showFavorite(Cursor data) {
+        view.setMovies(movieRepository.getMoviesFromCursor(data));
     }
 }

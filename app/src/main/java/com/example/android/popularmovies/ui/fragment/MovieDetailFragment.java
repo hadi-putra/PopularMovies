@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,7 +58,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
     @BindView(R.id.rate_avg) TextView mRatingAverageTextView;
     @BindView(R.id.rate_count) TextView mRatingCountTextView;
     @BindView(R.id.overview) TextView mOverviewTextView;
-    @BindView(R.id.favorite) CheckBox mFavorite;
+    @BindView(R.id.fab_favorite) FloatingActionButton mFavoriteFab;
     @BindView(R.id.video_container) LinearLayout mVideoContainer;
     @BindView(R.id.review_container) LinearLayout mReviewContainer;
 
@@ -100,6 +100,8 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
             mScrollView.post(() ->
                     mScrollView.scrollTo(scrollState[0], scrollState[1]));
         }
+
+        mPresenter.checkFavorite();
     }
 
     @Nullable
@@ -113,9 +115,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        mFavorite.setOnCheckedChangeListener((CompoundButton compoundButton, boolean check) -> {
-            mPresenter.toggleFavorite(check);
-        });
+        mFavoriteFab.setOnClickListener(view1 -> mPresenter.toggleFavorite());
 
         Bundle args = getArguments();
         if (args != null){
@@ -133,7 +133,10 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
                 "%.1f/10", movie.getVoteAverage()));
         mOverviewTextView.setText(movie.getOverview());
         mRatingCountTextView.setText(String.valueOf(movie.getVoteCount()));
-        mFavorite.setChecked(movie.isFavorite());
+        if (movie.isFavorite())
+            mFavoriteFab.setImageResource(R.drawable.ic_favorite_fill);
+        else
+            mFavoriteFab.setImageResource(R.drawable.ic_favorite_border);
 
         if (movie.getBackdropPath() != null){
             Picasso.with(getActivity())
@@ -176,7 +179,8 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
                 TrailerModel t = (TrailerModel) view1.getTag();
                 if (t.getSite().equalsIgnoreCase("YouTube")){
                     Intent intent = new Intent(Intent.ACTION_VIEW, MovieUtil.getVideoUri(t.getKey()));
-                    startActivity(intent);
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null)
+                        startActivity(intent);
                 } else {
                     Toast.makeText(getContext(), R.string.video_not_supported, Toast.LENGTH_SHORT).show();
                 }
@@ -217,6 +221,12 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
         }
 
         mReviewContainer.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void toggleFavoriteFab(boolean favorite) {
+        mFavoriteFab.setImageResource(favorite? R.drawable.ic_favorite_fill :
+                R.drawable.ic_favorite_border);
     }
 
     @Override

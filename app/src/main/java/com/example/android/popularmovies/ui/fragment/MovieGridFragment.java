@@ -2,13 +2,18 @@ package com.example.android.popularmovies.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +24,8 @@ import android.widget.ProgressBar;
 
 import com.example.android.popularmovies.PosterAdapter;
 import com.example.android.popularmovies.R;
+import com.example.android.popularmovies.data.Contract.MovieContract;
+import com.example.android.popularmovies.data.MovieRepository;
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.presenter.MainPresenter;
 import com.example.android.popularmovies.ui.activity.MovieDetailActivity;
@@ -46,6 +53,8 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
     private static final String SORT_STATE_KEY = "com.example.popularmovies.sortstate";
     private static final String SELECTED_MOVIE_KEY = "com.example.popularmovies.selectedmovie";
 
+    private static final int ID_FAVORITE_LOADER = 115;
+
     @BindView(R.id.rv_grid_movie_poster) RecyclerView mGridPosterRecyclerView;
     @BindView(R.id.pb_loading_movies) ProgressBar mLoadingProgressBar;
 
@@ -56,6 +65,32 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
     private MovieGridFragmentListener mListener;
     private Sort selectedSort = Sort.POPULAR;
     private MovieModel selectedMovie;
+
+    private LoaderManager.LoaderCallbacks<Cursor> favoriteLoader =
+            new LoaderManager.LoaderCallbacks<Cursor>() {
+                @Override
+                public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+                    if (id == ID_FAVORITE_LOADER) {
+                        return new CursorLoader(getActivity(),
+                                MovieContract.MovieEntry.CONTENT_URI,
+                                MovieRepository.MOVIE_PROJECTION,
+                                null, null, null);
+                    } else
+                        throw new RuntimeException("Loader Not Implemented: " + id);
+                }
+
+                @Override
+                public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+                    if (selectedSort == FAVORITE)
+                        mPresenter.showFavorite(data);
+                }
+
+                @Override
+                public void onLoaderReset(Loader<Cursor> loader) {
+                    if (selectedSort == FAVORITE)
+                        mPosterAdapter.setMovies(null);
+                }
+            };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,17 +116,31 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
         mPosterAdapter = new PosterAdapter(this);
         mGridPosterRecyclerView.setAdapter(mPosterAdapter);
 
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
             mStateGrid = savedInstanceState.getParcelable(GRID_STATE_KEY);
             selectedSort = (Sort) savedInstanceState.get(SORT_STATE_KEY);
             selectedMovie = savedInstanceState.getParcelable(SELECTED_MOVIE_KEY);
 
-            getTitle(selectedSort);
+            getActivity().setTitle(getTitle(selectedSort));
         }
         if (selectedSort == FAVORITE)
-            mPresenter.loadFavorite();
+            loadFavorite();
         else
             mPresenter.loadMovie(selectedSort);
+    }
+
+    private void loadFavorite() {
+        LoaderManager manager = getActivity().getSupportLoaderManager();
+        Loader<Cursor> loader = manager.getLoader(ID_FAVORITE_LOADER);
+        if (loader == null)
+            manager.initLoader(ID_FAVORITE_LOADER, null, favoriteLoader);
+        else
+            manager.restartLoader(ID_FAVORITE_LOADER, null, favoriteLoader);
     }
 
     @Override
@@ -173,7 +222,7 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
         getActivity().setTitle(getTitle(option));
         selectedSort = option;
         if (option == FAVORITE)
-            mPresenter.loadFavorite();
+            loadFavorite();
         else
             mPresenter.loadMovie(option);
     }
@@ -196,7 +245,7 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
         if (selectedMovie == null && movieModels.size() > 0){
             selectedMovie = movieModels.get(0);
         }
-        if (mListener.isTwoPaneMode())
+        if (mListener.isTwoPaneMode() && selectedMovie != null)
             mListener.setSelectedMovie(selectedMovie);
     }
 

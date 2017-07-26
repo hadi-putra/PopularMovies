@@ -1,17 +1,15 @@
 package com.example.android.popularmovies.ui.activity;
 
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.ui.fragment.MovieDetailFragment;
 import com.example.android.popularmovies.ui.fragment.MovieGridFragment;
-import com.example.android.popularmovies.util.Sort;
 
 import javax.inject.Inject;
 
@@ -23,6 +21,8 @@ import dagger.android.support.HasSupportFragmentInjector;
 public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector,
         MovieGridFragment.MovieGridFragmentListener{
     private static final String MOVIE_FRAGMENT_DETAIL_TAG = "fragment_movie_detail";
+
+    private Handler handler = new Handler();
 
     @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
     private boolean isTwoPaneMode;
@@ -48,11 +48,14 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     public void setSelectedMovie(MovieModel movie) {
-        if (movie != null) {
-            MovieDetailFragment fragment = MovieDetailFragment.newInstance(movie);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_fragment, fragment, MOVIE_FRAGMENT_DETAIL_TAG)
-                    .commit();
-        }
+        handler.post(()->{
+            if (movie != null) {
+                MovieDetailFragment fragment = MovieDetailFragment.newInstance(movie);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_fragment, fragment, MOVIE_FRAGMENT_DETAIL_TAG)
+                        .commit();
+            }
+        });
+
     }
 }

@@ -68,4 +68,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
     annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
+    compile 'com.android.support:design:25.3.1'
 }
