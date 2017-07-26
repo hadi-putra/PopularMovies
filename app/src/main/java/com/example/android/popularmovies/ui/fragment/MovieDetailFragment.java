@@ -128,6 +128,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
         getActivity().setTitle(movie.getTitle());
         mTitleTextView.setText(movie.getTitle());
         mReleaseDateTextView.setText(movie.getReleaseDate());
+        // show the vote_average
         mRatingAverageTextView.setText(String.format(Locale.getDefault(),
                 "%.1f/10", movie.getVoteAverage()));
         mOverviewTextView.setText(movie.getOverview());
