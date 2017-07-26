@@ -17,12 +17,16 @@ import com.squareup.sqlbrite2.BriteContentResolver;
 import com.squareup.sqlbrite2.SqlBrite;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created by msk-1196 on 7/23/17.
@@ -36,6 +40,8 @@ public class MovieRepository {
     private final BriteContentResolver briteContentResolver;
     private final ContentResolver contentResolver;
 
+    private BehaviorSubject<Set<Long>> mSavedMovieIdsSubject;
+
     private static final String[] MOVIE_PROJECTION = new String[]{
             MovieContract.MovieEntry.COLUMN_MOVIEDB_ID,
             MovieContract.MovieEntry.COLUMN_TITLE,
@@ -47,6 +53,10 @@ public class MovieRepository {
             MovieContract.MovieEntry.COLUMN_POPULAITY,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_IS_FAVORITE
+    };
+
+    private static final String[] MOVIEDB_ID_PROJECTION = new String[]{
+            MovieContract.MovieEntry.COLUMN_MOVIEDB_ID
     };
 
     private static final int INDEX_MOVIEDB_ID = 0;
@@ -71,6 +81,27 @@ public class MovieRepository {
     public Observable<List<MovieModel>> getSortedMovies(Sort selectedSort) {
         return movieApi.getMovies(selectedSort == Sort.RATING? TOP_RATED_QUERY : POPULAR_QUERY)
                 .map(ResponseApi::getResults)
+                .withLatestFrom(getFavoriteIds(), ((movies, favoriteMovieDbIds) -> {
+                    for (MovieModel movie : movies){
+                        movie.setFavorite(favoriteMovieDbIds.contains(movie.getId()));
+                    }
+                    return movies;
+                }))
+                .subscribeOn(Schedulers.io());
+    }
+
+    private Observable<Set<Long>> getFavoriteIds() {
+        if (mSavedMovieIdsSubject == null){
+            mSavedMovieIdsSubject = BehaviorSubject.create();
+            favoriteIds().subscribe(mSavedMovieIdsSubject);
+        }
+        return mSavedMovieIdsSubject.hide();
+    }
+
+    private Observable<Set<Long>> favoriteIds() {
+        return briteContentResolver.createQuery(MovieContract.MovieEntry.CONTENT_URI, MOVIEDB_ID_PROJECTION,
+                null, null, null, true)
+                .map(MOVIEDB_ID_PROJECTION_MAP)
                 .subscribeOn(Schedulers.io());
     }
 
@@ -114,6 +145,18 @@ public class MovieRepository {
             cursor.close();
         }
         return movies;
+    };
+
+    private Function<SqlBrite.Query, Set<Long>> MOVIEDB_ID_PROJECTION_MAP = query -> {
+        Set<Long> moviedbIds = new HashSet<>();
+        Cursor cursor = query.run();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                moviedbIds.add(cursor.getLong(INDEX_MOVIEDB_ID));
+            }
+            cursor.close();
+        }
+        return moviedbIds;
     };
 
     public void toggleFavorite(boolean isFavorite, MovieModel movie) {

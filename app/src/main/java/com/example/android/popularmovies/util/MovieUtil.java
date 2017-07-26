@@ -12,6 +12,7 @@ import com.example.android.popularmovies.model.MovieModel;
 public class MovieUtil {
     private static final transient String BASE_PHOTO_PATH = "http://image.tmdb.org/t/p/w185";
     private static final transient String BASE_BACKDROP_PATH = "http://image.tmdb.org/t/p/w342";
+    private static final transient String YOUTUBE_THUMBNAIL_PATH = "http://img.youtube.com/vi/";
 
 
     public static String getFullPosterPath(String posterPath){
@@ -37,5 +38,14 @@ public class MovieUtil {
         cv.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
         cv.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, movie.isFavorite()? 1: 0);
         return cv;
+    }
+
+    public static String getYoutubeThumbnailPath(String videoKey){
+        return YOUTUBE_THUMBNAIL_PATH+videoKey+"/default.jpg";
+    }
+
+    public static String customNullAuthor(String author) {
+        if (author == null || author.isEmpty()) return "No name";
+        return author;
     }
 }

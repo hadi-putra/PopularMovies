@@ -48,9 +48,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     public void setSelectedMovie(MovieModel movie) {
-        MovieDetailFragment fragment = MovieDetailFragment.newInstance(movie);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.movie_detail_fragment, fragment, MOVIE_FRAGMENT_DETAIL_TAG)
-                .commit();
+        if (movie != null) {
+            MovieDetailFragment fragment = MovieDetailFragment.newInstance(movie);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_fragment, fragment, MOVIE_FRAGMENT_DETAIL_TAG)
+                    .commit();
+        }
     }
 }

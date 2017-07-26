@@ -1,13 +1,18 @@
 package com.example.android.popularmovies.presenter;
 
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieRepository;
 import com.example.android.popularmovies.model.MovieModel;
 import com.example.android.popularmovies.model.ResponseApi;
+import com.example.android.popularmovies.model.ReviewModel;
 import com.example.android.popularmovies.model.TrailerModel;
 import com.example.android.popularmovies.ui.view.MovieDetailView;
 import com.example.android.popularmovies.util.MovieApi;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -25,6 +30,9 @@ public class MovieDetailPresenter {
     private final MovieRepository movieRepository;
     private MovieModel selectedMovie;
 
+    private List<TrailerModel> videos;
+    private List<ReviewModel> reviews;
+
     @Inject
     public MovieDetailPresenter(MovieDetailView view, MovieRepository movieRepository) {
         this.view = view;
@@ -38,20 +46,30 @@ public class MovieDetailPresenter {
     }
 
     public void loadTrailer() {
+        if (videos != null){
+            view.showTrailer(videos);
+            return;
+        }
         compositeDisposable.add(movieRepository.getMovieVideos(selectedMovie.getId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(trailerModels -> {
-                    Log.e("TRAILERS", trailerModels.toString());
+                    this.videos = trailerModels;
+                    view.showTrailer(trailerModels);
                 },throwable -> {
 
                 }));
     }
 
     public void loadReview() {
+        if (reviews != null){
+            view.showReview(reviews);
+            return;
+        }
         compositeDisposable.add(movieRepository.getMovieReviews(selectedMovie.getId())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(trailerModels -> {
-                    Log.e("REVIEWS", trailerModels.toString());
+                .subscribe(reviews -> {
+                    this.reviews = reviews;
+                    view.showReview(reviews);
                 },throwable -> {
 
                 }));
@@ -60,5 +78,21 @@ public class MovieDetailPresenter {
     public void toggleFavorite(boolean isFavorite) {
         selectedMovie.setFavorite(isFavorite);
         movieRepository.toggleFavorite(isFavorite, selectedMovie);
+    }
+
+    public List<TrailerModel> getVideos() {
+        return videos;
+    }
+
+    public List<ReviewModel> getReviews() {
+        return reviews;
+    }
+
+    public void setVideos(ArrayList<TrailerModel> videos) {
+        this.videos = videos;
+    }
+
+    public void setReviews(ArrayList<ReviewModel> reviews) {
+        this.reviews = reviews;
     }
 }

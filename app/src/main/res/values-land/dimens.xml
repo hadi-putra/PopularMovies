@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="backdrop_height">300dp</dimen>
+    <dimen name="default_padding">22dp</dimen>
+    <dimen name="marginTop_poster">200dp</dimen>
+    <dimen name="marginTop_favorite">230dp</dimen>
+</resources>

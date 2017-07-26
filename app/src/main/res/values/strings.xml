@@ -13,5 +13,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="favorite_label">Favorite</string>
     <string name="favorite_title">Favorite Movies</string>
-    <string name="dummy_rating_avg">4.5</string>
+    <string name="dummy_rating_avg">4.5/10</string>
+    <string name="dummy_rating_count">7000</string>
+    <string name="dummy_release_date">25 July, 2017</string>
+    <string name="overview_label">Overview</string>
+    <string name="video_label">Video</string>
+    <string name="review_label">Review</string>
 </resources>

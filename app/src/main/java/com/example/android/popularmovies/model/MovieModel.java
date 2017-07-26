@@ -23,12 +23,16 @@ public class MovieModel implements Parcelable {
     private boolean isFavorite;
 
     public MovieModel(Parcel parcel) {
+        id = parcel.readLong();
         title = parcel.readString();
         backdropPath = parcel.readString();
         voteAverage = parcel.readDouble();
+        voteCount = parcel.readInt();
+        popularity = parcel.readDouble();
         posterPath = parcel.readString();
         releaseDate = parcel.readString();
         overview = parcel.readString();
+        isFavorite = parcel.readInt() == 1;
     }
 
     public MovieModel() {
@@ -121,12 +125,16 @@ public class MovieModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
         parcel.writeString(title);
         parcel.writeString(backdropPath);
         parcel.writeDouble(voteAverage);
+        parcel.writeInt(voteCount);
+        parcel.writeDouble(popularity);
         parcel.writeString(posterPath);
         parcel.writeString(releaseDate);
         parcel.writeString(overview);
+        parcel.writeInt(isFavorite? 1 : 0);
     }
 
     public static final Parcelable.Creator CREATOR = new Creator() {

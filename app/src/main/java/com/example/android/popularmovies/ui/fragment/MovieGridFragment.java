@@ -86,11 +86,12 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
             selectedSort = (Sort) savedInstanceState.get(SORT_STATE_KEY);
             selectedMovie = savedInstanceState.getParcelable(SELECTED_MOVIE_KEY);
 
-            getActivity().setTitle(selectedSort == Sort.POPULAR? R.string.app_name :
-                    R.string.top_rated_title);
+            getTitle(selectedSort);
         }
-
-        mPresenter.loadMovie(selectedSort);
+        if (selectedSort == FAVORITE)
+            mPresenter.loadFavorite();
+        else
+            mPresenter.loadMovie(selectedSort);
     }
 
     @Override
@@ -133,6 +134,9 @@ public class MovieGridFragment extends Fragment implements MainView, PosterAdapt
                 break;
             case POPULAR:
                 menu.findItem(R.id.action_popular).setChecked(true);
+                break;
+            case FAVORITE:
+                menu.findItem(R.id.action_favorite).setChecked(true);
                 break;
         }
     }
