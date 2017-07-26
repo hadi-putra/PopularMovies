@@ -22,4 +22,6 @@
     <string name="video_not_supported">Unsupported video format</string>
     <string name="action_share">Share</string>
     <string name="share_template">Check out \'<xliff:g id="title">%1$s</xliff:g>\' at <xliff:g id="url">%2$s</xliff:g></string>
+    <string name="dummy_title" translatable="false">The Rise of The Planet of The Apes</string>
+    <string name="dummy_overview" translatable="false">lorem ipsum sir dolor amet</string>
 </resources>

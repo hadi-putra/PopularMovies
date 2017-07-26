@@ -36,8 +36,10 @@ public class MovieProvider extends ContentProvider {
         String authority = BaseContract.AUTHORITY;
         matcher.addURI(authority, MovieContract.PATH_MOVIE, CODE_MOVIE);
         matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#", CODE_MOVIE_WITH_ID);
-        matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#/"+ TrailerContract.PATH_TRAILER, CODE_MOVIE_VIDEO);
-        matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#/"+ ReviewContract.PATH_REVIEW, CODE_MOVIE_REVIEW);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#/"+ TrailerContract.PATH_TRAILER,
+                CODE_MOVIE_VIDEO);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#/"+ ReviewContract.PATH_REVIEW,
+                CODE_MOVIE_REVIEW);
         matcher.addURI(authority, ReviewContract.PATH_REVIEW+"/*", CODE_REVIEW_WITH_ID);
         return matcher;
     }
@@ -82,7 +84,8 @@ public class MovieProvider extends ContentProvider {
         SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
         switch (sUriMatcher.match(uri)){
             case CODE_MOVIE:
-                sqLiteDatabase.insertOrThrow(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
+                sqLiteDatabase.insertOrThrow(MovieContract.MovieEntry.TABLE_NAME,
+                        null, contentValues);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return MovieContract.MovieEntry.buildMovieWithMovieDBId(
                         contentValues.getAsLong(MovieContract.MovieEntry.COLUMN_MOVIEDB_ID));
@@ -97,7 +100,8 @@ public class MovieProvider extends ContentProvider {
         int totalRow = 0;
         switch (sUriMatcher.match(uri)){
             case CODE_MOVIE:
-                totalRow = sqLiteDatabase.delete(MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
+                totalRow = sqLiteDatabase.delete(MovieContract.MovieEntry.TABLE_NAME,
+                        selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -109,7 +113,8 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s,
+                      @Nullable String[] strings) {
         return 0;
     }
 }

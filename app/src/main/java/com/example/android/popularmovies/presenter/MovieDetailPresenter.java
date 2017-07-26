@@ -46,6 +46,8 @@ public class MovieDetailPresenter {
     }
 
     public void loadTrailer() {
+        if (selectedMovie == null) return;
+
         if (videos != null){
             view.showTrailer(videos);
             return;
@@ -61,6 +63,8 @@ public class MovieDetailPresenter {
     }
 
     public void loadReview() {
+        if (selectedMovie == null) return;
+
         if (reviews != null){
             view.showReview(reviews);
             return;

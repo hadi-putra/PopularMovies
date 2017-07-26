@@ -55,7 +55,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
     @BindView(R.id.movie_poster) ImageView mPosterImageView;
     @BindView(R.id.title) TextView mTitleTextView;
     @BindView(R.id.release_date) TextView mReleaseDateTextView;
-    @BindView(R.id.rate_avg) TextView mRatingTextView;
+    @BindView(R.id.rate_avg) TextView mRatingAverageTextView;
     @BindView(R.id.rate_count) TextView mRatingCountTextView;
     @BindView(R.id.overview) TextView mOverviewTextView;
     @BindView(R.id.favorite) CheckBox mFavorite;
@@ -85,6 +85,23 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null){
+            scrollState = savedInstanceState.getIntArray(SCROLL_STATE_KEY);
+            mPresenter.setVideos(savedInstanceState.getParcelableArrayList(VIDEOS_STATE_KEY));
+            mPresenter.setReviews(savedInstanceState.getParcelableArrayList(REVIEWS_STATE_KEY));
+        }
+
+        mPresenter.loadTrailer();
+        mPresenter.loadReview();
+        if (scrollState != null && scrollState.length == 2) {
+            mScrollView.post(() ->
+                    mScrollView.scrollTo(scrollState[0], scrollState[1]));
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -100,20 +117,9 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
             mPresenter.toggleFavorite(check);
         });
 
-        if (savedInstanceState != null) {
-            scrollState = savedInstanceState.getIntArray(SCROLL_STATE_KEY);
-            mPresenter.setVideos(savedInstanceState.getParcelableArrayList(VIDEOS_STATE_KEY));
-            mPresenter.setReviews(savedInstanceState.getParcelableArrayList(REVIEWS_STATE_KEY));
-        }
-
         Bundle args = getArguments();
         if (args != null){
             mPresenter.setDetailForMovie(args.getParcelable(CONTENT_KEY));
-            mPresenter.loadTrailer();
-            mPresenter.loadReview();
-            if (scrollState != null && scrollState.length == 2) {
-                mScrollView.post(() -> mScrollView.scrollTo(scrollState[0], scrollState[1]));
-            }
         }
     }
 
@@ -122,7 +128,8 @@ public class MovieDetailFragment extends Fragment implements MovieDetailView {
         getActivity().setTitle(movie.getTitle());
         mTitleTextView.setText(movie.getTitle());
         mReleaseDateTextView.setText(movie.getReleaseDate());
-        mRatingTextView.setText(String.format(Locale.getDefault(), "%.1f", movie.getVoteAverage()));
+        mRatingAverageTextView.setText(String.format(Locale.getDefault(),
+                "%.1f/10", movie.getVoteAverage()));
         mOverviewTextView.setText(movie.getOverview());
         mRatingCountTextView.setText(String.valueOf(movie.getVoteCount()));
         mFavorite.setChecked(movie.isFavorite());
